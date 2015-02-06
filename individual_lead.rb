@@ -1,58 +1,48 @@
 require_relative "helper_methods"
 require_relative "login_page_test"
+require 'test/unit'
 
-$driver = open_browser
+# Actions
+def log_outbound_call(driver, title, body)
+  click_button(driver, :css, "#actions .actions button[data-target='#log-call-form']")
 
-def select_lead(lead_num)
-  wait_for_element(:css, "table.table.table-hover > tbody > tr:nth-child(" + lead_num + ")", 10);
+  wait_for_element_to_be_visible(driver, "outbound_call_note_summary", 1);
 
-  leads = $driver.find_element(:css, "table.table.table-hover > tbody > tr:nth-child(" + lead_num + ")")
-  leads.click
-end
-
-def log_outbound_call(title, body)
-  click_button($driver, :css, "#actions .actions button[data-target='#log-call-form']")
-  
-  title_field = $driver.find_element(:id, "outbound_call_note_summary")
+  title_field = driver.find_element(:id, "outbound_call_note_summary")
   title_field.send_keys title
 
-  body_field = $driver.find_element(:id, "outbound_call_note_desc")
+  body_field = driver.find_element(:id, "outbound_call_note_desc")
   body_field.send_keys body
 
   title_field.submit
 end
 
-def log_inbound_call(title, body)
-  click_button($driver, :css, "#actions .actions button[data-target='#log-inbound-call-form']")
-  
-  title_field = $driver.find_element(:id, "inbound_call_note_summary")
+def log_inbound_call(driver, title, body)
+  click_button(driver, :css, "#actions .actions button[data-target='#log-inbound-call-form']")
+
+  wait_for_element_to_be_visible(driver, "inbound_call_note_summary", 1);
+
+  title_field = driver.find_element(:id, "inbound_call_note_summary")
   title_field.send_keys title
 
-  body_field = $driver.find_element(:id, "inbound_call_note_desc")
+  body_field = driver.find_element(:id, "inbound_call_note_desc")
   body_field.send_keys body
 
   title_field.submit
 end
 
-def withdraw_lead
+def withdraw_lead (driver)
   begin
-    click_button($driver, :css, "#lead-transition .pull-right.glyphicon-collapse-down")
+    click_button(driver, :css, "#lead-transition .pull-right.glyphicon-collapse-down")
   rescue Selenium::WebDriver::Error::NoSuchElementError
     puts "Element not found."
   end
 
-  click_button($driver, :css, "button[value=withdrawn]")
+  click_button(driver, :css, "button[value=withdrawn]")
 end
 
-# Login 
-login($driver, "jvillanueva", "")
-
-# Click Leads Page Button
-click_button($driver, :link, "Leads")
-
-# Select a lead based on index
-select_lead("1")
-
-# log_outbound_call("Test Title", "Test Body")
-# log_inbound_call("Test Title", "Test Body")
-# withdraw_lead
+# Test Cases
+def verify_log_outbound_call(driver, hash)
+  #TODO: verify that a note with hash text has been created, and print to console.
+  # assert_equal(driver.find_element(:id, "notes-list"), hash)
+end
