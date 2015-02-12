@@ -35,6 +35,23 @@ def wait_for_element_to_be_visible(id, name, time)
   end
 end
 
+#Create struct for Employment Information in individual Lead page
+def generate_employement_information_structs(status_array, name, pos, tenure, phone, ext, email, addr, city, state_array, postal, url)
+  Struct.new("Leads", :status, :name, :position, :tenure, 
+    :work_phone, :work_phone_ext, :work_email, :work_address, 
+    :work_city, :work_state, :work_postal_code, :social_media_url)
+
+  leadsArray = []
+
+  for status in status_array
+    for state in state_array
+      leadsArray.push(Struct::Leads.new(status, name, pos, tenure, phone, ext, email, addr, city, state, postal, url))
+    end
+  end  
+
+  return leadsArray
+end
+
 # Print a test result to console
 def report_test_result(test_name, status, message)
 

@@ -16,3 +16,12 @@ log_outbound_call(hash, hash)
 verify_log_outbound_call(hash)
 
 log_inbound_call(hash, hash)
+
+# To test "Employment Information", we create individual structs
+# Each struct is an instance of a user input
+leadsArray = generate_employement_information_structs(['1','3','6'], 'Bob', '2', 'tenure', 'phone', 'ext', 'email', 'addr', 'city', ['CA', 'WA'], 'postal', 'url')
+
+edit_employment_information(leadsArray)
+
+
+
