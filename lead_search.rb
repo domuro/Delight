@@ -7,14 +7,14 @@ def lead_search_filter(filter_text)
   filter.send_keys filter_text
 end
 
-def select_lead(lead_num)
-  element = "table.table.table-hover > tbody > tr:nth-child(" + lead_num + ")"
-
+def select_lead(lead_state)
   begin
-    wait_for_element(:css, element, 10);
-    leads = @driver.find_element(:css, element)
-    leads.click
+    row = 1
+    begin
+      element = @driver.find_element(:xpath,'//*[@id="customer-leads"]/div[2]/table/tbody/tr['+row.to_s+']/td[3]')
+      row += 1
+    end while !element.text.eql?(lead_state)
+    element.click
   rescue
-    # puts "Element not found."
   end
 end

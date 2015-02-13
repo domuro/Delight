@@ -89,7 +89,7 @@ def edit_employment_information(custom_struct_array)
       @driver.find_element(:css, '#employer_street_address1').send_keys i.work_address
     end
 
-    if (i.work_city != nil)    
+    if (i.work_city != nil)
       @driver.find_element(:css, '#employer_city').clear()
       @driver.find_element(:css, '#employer_city').send_keys i.work_city
     end
@@ -108,10 +108,72 @@ def edit_employment_information(custom_struct_array)
 
     @driver.find_element(:css, '#social_media_url').submit
 
-    sleep 2
+    sleep 1
 
-    verify_employment_information(i)    
+    verify_employment_information(i)
   end
+end
+
+def edit_ach_information(achInfoArray)
+  for i in achInfoArray
+
+    #Click edit button, if not already clicked
+    begin
+      click_button(:xpath, '//*[@id="ach-info"]/div[1]/span[1]')
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      # click_button(:css, "#employment-info .employment-info-edit.pull-right.glyphicon.glyphicon-pencil")
+    end
+
+    click_button(:xpath, '//*[@id="'+i.type+'"]')
+
+    if (i.holder != nil)
+      @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').clear()
+      @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').send_keys i.holder
+    end
+
+    if (i.institution != nil)
+      @driver.find_element(:xpath, '//*[@id="institution"]').clear()
+      @driver.find_element(:xpath, '//*[@id="institution"]').send_keys i.institution
+    end
+
+    if (i.account_number != nil)
+      @driver.find_element(:xpath, '//*[@id="account-number"]').clear()
+      @driver.find_element(:xpath, '//*[@id="account-number"]').send_keys i.account_number
+    end
+
+    if (i.routing_number != nil)
+      @driver.find_element(:xpath, '//*[@id="routing-number"]').clear()
+      @driver.find_element(:xpath, '//*[@id="routing-number"]').send_keys i.routing_number
+    end
+
+    @driver.find_element(:xpath, '//*[@id="form-ach-info"]/div[7]/div/input').submit
+    sleep 1
+    verify_ach_information(i)
+  end
+end
+
+def withdraw_lead()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
+
+def set_agent_verified()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[2]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[2]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
+
+def decline_manual_review()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[4]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[4]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
 end
 
 def verify_employment_information(custom_struct)
@@ -129,6 +191,59 @@ def verify_employment_information(custom_struct)
   message = '"' + @driver.find_element(:css, '#employment-info-view .dl-horizontal dd:nth-child(2)').text + '"'
   report_test_result("Edit Employment Information - Employment Status", result, message)
 
+end
+
+def verify_ach_information(ach_information)
+  if ach_information.type.eql?('account-type-checking')
+    type = 'Checking'
+  elsif ach_information.type.eql?('account-type-savings')
+    type = 'Savings'
+  end
+
+  result = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
+  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
+  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
+  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
+
+  report_test_result("Edit ACH Information", result, "")
+end
+
+def verify_log_outbound_call(hash)
+  sleep 2
+
+  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4').text.include?(hash)
+  result = result && @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4/small').text.include?("Outbound")
+  message = "Message: " + hash
+
+  report_test_result("Log Outbound Call", result, message)
+end
+
+def verify_log_inbound_call(hash)
+  sleep 2
+  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4').text.include?(hash)
+  result = result && @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4/small').text.include?("Inbound")
+  message = "Message: " + hash
+
+  report_test_result("Log Inbound Call", result, message)
+end
+
+def verify_withdraw_lead()
+  sleep 1
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Withdrawn')
+  report_test_result("Withdraw Lead", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
+end
+
+def verify_set_agent_verified()
+  sleep 1
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Agent Verified')
+  report_test_result("Set Agent Verified", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
+end
+
+def verify_decline_manual_review()
+  sleep 1
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Decline Manual Review')
+  report_test_result("Decline Manual Review", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
 
 # def edit_employment_information_employment_status(status)
@@ -155,14 +270,3 @@ end
 #   click_button(:css, '#employer_state option:nth-child('+state+')')
 #   @driver.find_element(:css, '#employer_state option:nth-child('+state+')').submit
 # end
-
-# Test Cases
-def verify_log_outbound_call(hash)
-  sleep 2
-
-  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4').text.include?(hash)
-  result = result && @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4/small').text.include?("Outbound")
-  message = ""
-
-  report_test_result("Log Outbound Call", result, message)
-end

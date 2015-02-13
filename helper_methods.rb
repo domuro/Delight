@@ -37,17 +37,29 @@ end
 
 #Create struct for Employment Information in individual Lead page
 def generate_employement_information_structs(status_array, name, pos, tenure, phone, ext, email, addr, city, state_array, postal, url)
-  Struct.new("Leads", :status, :name, :position, :tenure, 
-    :work_phone, :work_phone_ext, :work_email, :work_address, 
+  Struct.new("EmploymentInformation", :status, :name, :position, :tenure,
+    :work_phone, :work_phone_ext, :work_email, :work_address,
     :work_city, :work_state, :work_postal_code, :social_media_url)
 
   leadsArray = []
 
   for status in status_array
     for state in state_array
-      leadsArray.push(Struct::Leads.new(status, name, pos, tenure, phone, ext, email, addr, city, state, postal, url))
+      leadsArray.push(Struct::EmploymentInformation.new(status, name, pos, tenure, phone, ext, email, addr, city, state, postal, url))
     end
-  end  
+  end
+
+  return leadsArray
+end
+
+def generate_ach_information_structs(type_array, holder, institution, account_number, routing_number)
+  Struct.new("AchInformation", :type, :holder, :institution, :account_number, :routing_number)
+
+  leadsArray = []
+
+  for type in type_array
+    leadsArray.push(Struct::AchInformation.new(type, holder, institution, account_number, routing_number))
+  end
 
   return leadsArray
 end
