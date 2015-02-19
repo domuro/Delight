@@ -2,32 +2,53 @@ require_relative "helper_methods"
 require_relative "login_page_test"
 
 # Actions
-def log_outbound_call(title, body)
-  click_button(:css, "#actions .actions button[data-target='#log-call-form']")
 
-  wait_for_element_to_be_visible(:id, "outbound_call_note_summary", 5);
+# submit_type options:
+#   disconnected, wrong_number, no_answer_busy, left_voicemail, log_call
+def log_outbound_call(phone_number, disposition_num, note, submit_type)
+  click_button(:css, "#actions .actions .panel:nth-child(1) button")
 
-  title_field = @driver.find_element(:id, "outbound_call_note_summary")
-  title_field.send_keys title
+  wait_for_element_to_be_visible(:id, "call_log_phone_number", 5);
 
-  body_field = @driver.find_element(:id, "outbound_call_note_desc")
-  body_field.send_keys body
+  phone_number_field = @driver.find_element(:id, "call_log_phone_number")
+  phone_number_field.clear()
+  phone_number_field.send_keys phone_number
 
-  title_field.submit
+  click_button(:css, '#call_log_disposition')
+  click_button(:css, '#call_log_disposition option:nth-child(' + disposition_num +')')
+
+  note_field = @driver.find_element(:id, "call_log_notes")
+  note_field.clear()
+  note_field.send_keys note
+
+  if submit_type == 'disconnected' || submit_type == 'wrong_number'
+    click_button(:css, "#call-log-form .dropdown button")
+    click_button(:css, "#call-log-form .dropdown a[data-submit-action=" + submit_type + "]")
+  else
+    click_button(:css, "#call-log-form input[data-submit-action=" + submit_type + "]")
+  end
 end
 
-def log_inbound_call(title, body)
-  click_button(:css, "#actions .actions button[data-target='#log-inbound-call-form']")
+def log_inbound_call(phone_number, phone_type, disposition_num, note)
+  click_button(:css, "#actions .actions .panel:nth-child(2) button")
 
-  wait_for_element_to_be_visible(:id, "inbound_call_note_summary", 5);
+  wait_for_element_to_be_visible(:id, "call_log_phone_number", 5);
 
-  title_field = @driver.find_element(:id, "inbound_call_note_summary")
-  title_field.send_keys title
+  phone_number_field = @driver.find_element(:id, "call_log_phone_number")
+  phone_number_field.clear()
+  phone_number_field.send_keys phone_number
 
-  body_field = @driver.find_element(:id, "inbound_call_note_desc")
-  body_field.send_keys body
+  click_button(:css, "#phone_type")
+  click_button(:css, '#phone_type option:nth-child(' + phone_type +')')
 
-  title_field.submit
+  click_button(:css, '#call_log_disposition')
+  click_button(:css, '#call_log_disposition option:nth-child(' + disposition_num +')')
+
+  note_field = @driver.find_element(:id, "call_log_notes")
+  note_field.clear()
+  note_field.send_keys note
+
+  click_button(:css, "#call-log-form input[data-submit-action=log_call]")
 end
 
 def withdraw_lead()
@@ -38,6 +59,8 @@ def withdraw_lead()
   end
 
   click_button(:css, "button[value=withdrawn]")
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
 end
 
 def edit_employment_information(custom_struct_array)
@@ -152,13 +175,14 @@ def edit_ach_information(achInfoArray)
   end
 end
 
-def withdraw_lead()
-  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
-  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
-  click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
+# withdraw_lead() already exists
+# def withdraw_lead()
+#   click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+#   wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
+#   click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
 
-  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
-end
+#   @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+# end
 
 def set_agent_verified()
   click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
@@ -210,10 +234,9 @@ def verify_ach_information(ach_information)
 end
 
 def verify_log_outbound_call(hash)
-  sleep 2
+  sleep 3
 
-  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4').text.include?(hash)
-  result = result && @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4/small').text.include?("Outbound")
+  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(hash)
   message = "Message: " + hash
 
   report_test_result("Log Outbound Call", result, message)
@@ -221,27 +244,27 @@ end
 
 def verify_log_inbound_call(hash)
   sleep 2
-  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4').text.include?(hash)
-  result = result && @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div/h4/small').text.include?("Inbound")
+
+  result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(hash)
   message = "Message: " + hash
 
   report_test_result("Log Inbound Call", result, message)
 end
 
 def verify_withdraw_lead()
-  sleep 1
+  sleep 4
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Withdrawn')
   report_test_result("Withdraw Lead", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
 
 def verify_set_agent_verified()
-  sleep 1
+  sleep 2
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Agent Verified')
   report_test_result("Set Agent Verified", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
 
 def verify_decline_manual_review()
-  sleep 1
+  sleep 2
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Decline Manual Review')
   report_test_result("Decline Manual Review", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
