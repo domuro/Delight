@@ -1,8 +1,56 @@
 require_relative "helper_methods"
 require_relative "login_page_test"
 
-# Actions
+def test_log_outbound_call()
+  submit_type_keys = {'disconnected' => 'Disconnected', 'wrong_number' => 'Wrong Number', 'no_answer_busy' => 'No Answer Busy',
+                      'left_voicemail' => 'Left Voicemail'}
 
+  phone_number_inputs = ["", "valid_input"]
+  # disposition_inputs = ["1", "2", "3", "4", "5", "6", "7"]
+  disposition_inputs = ["1", "2"]
+  notes_inputs = ["", "This is a valid note."]
+  # submit_type_inputs = ["disconnected", "wrong_number", "no_answer_busy", "left_voicemail", "log_call"]
+  submit_type_inputs = ["disconnected", "wrong_number"]
+
+  for phone_number in phone_number_inputs
+    for disposition in disposition_inputs
+      for note in notes_inputs
+        for submit_type in submit_type_inputs
+            log_outbound_call(phone_number, disposition, note, submit_type)
+
+            if phone_number == ""
+              begin
+                element = get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
+              rescue
+                "Element does not exist."
+              end
+            elsif disposition == "1"
+              begin
+                element = get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
+              rescue
+                "Element does not exist."
+              end
+            elsif submit_type == 'log_call'
+
+              if note == ""
+                begin
+                  element = get_element(:css, '#call-log-form .form-group:nth-child(3).has-error')
+                rescue
+                  "Element does not exist."
+                end
+              else
+                verify_log_outbound_call(note)
+              end
+            else
+              verify_log_outbound_call(submit_type_keys[submit_type])
+            end
+        end
+      end
+    end
+  end
+end
+
+# Actions
 # submit_type options:
 #   disconnected, wrong_number, no_answer_busy, left_voicemail, log_call
 def log_outbound_call(phone_number, disposition_num, note, submit_type)
@@ -51,27 +99,30 @@ def log_inbound_call(phone_number, phone_type, disposition_num, note)
   click_button(:css, "#call-log-form input[data-submit-action=log_call]")
 end
 
-def withdraw_lead()
-  begin
-    click_button(:css, "#lead-transition .pull-right.glyphicon-collapse-down")
-  rescue Selenium::WebDriver::Error::NoSuchElementError
-    puts "Element not found."
-  end
-
-  click_button(:css, "button[value=withdrawn]")
-
-  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
-end
+# def withdraw_lead()
+#   begin
+#     click_button(:css, "#lead-transition .pull-right.glyphicon-collapse-down")
+#   rescue Selenium::WebDriver::Error::NoSuchElementError
+#     puts "Element not found."
+#   end
+#
+#   click_button(:css, "button[value=withdrawn]")
+#
+#   @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+# end
 
 def edit_employment_information(custom_struct_array)
   for i in custom_struct_array
 
     #Click edit button, if not already clicked
-    begin
-      click_button(:css, "#employment-info .employment-info-edit.pull-right.glyphicon.glyphicon-pencil.hidden")
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      click_button(:css, "#employment-info .employment-info-edit.pull-right.glyphicon.glyphicon-pencil")
-    end
+    # begin
+    #   click_button(:css, "#employment-info .employment-info-edit.pull-right.glyphicon.glyphicon-pencil.hidden")
+    # rescue
+    #   # click_button(:css, "#employment-info .employment-info-edit.pull-right.glyphicon.glyphicon-pencil")
+    # end
+
+    wait_for_element_to_be_visible(:xpath, '//*[@id="employment-info"]/div[1]/span[1]', 10)
+    click_button(:xpath, '//*[@id="employment-info"]/div[1]/span[1]')
 
     click_button(:css, '#employment_status option:nth-child('+i.status+')')
 
@@ -131,8 +182,6 @@ def edit_employment_information(custom_struct_array)
 
     @driver.find_element(:css, '#social_media_url').submit
 
-    sleep 1
-
     verify_employment_information(i)
   end
 end
@@ -170,19 +219,18 @@ def edit_ach_information(achInfoArray)
     end
 
     @driver.find_element(:xpath, '//*[@id="form-ach-info"]/div[7]/div/input').submit
-    sleep 1
     verify_ach_information(i)
   end
 end
 
 # withdraw_lead() already exists
-# def withdraw_lead()
-#   click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
-#   wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
-#   click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
+def withdraw_lead()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
 
-#   @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
-# end
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
 
 def set_agent_verified()
   click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
@@ -200,6 +248,30 @@ def decline_manual_review()
   @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
 end
 
+def set_false_positive()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[2]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[2]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
+
+def set_pre_funding()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[2]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[2]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
+
+def fund()
+  click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
+  wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[2]/button', 5)
+  click_button(:xpath, '//*[@id="lead-state-edit"]/div[2]/button')
+
+  @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
+end
+
 def verify_employment_information(custom_struct)
   status_array = {}
   status_array['1'] = 'Employed'
@@ -209,12 +281,11 @@ def verify_employment_information(custom_struct)
   status_array['5'] = 'Self-employed'
   status_array['6'] = 'Retired'
   status_array['7'] = 'Other'
-
   # TODO: Make result report for each field of Employment Information
-  result = @driver.find_element(:css, '#employment-info-view .dl-horizontal dd:nth-child(2)').text.include?(status_array[custom_struct.status])
-  message = '"' + @driver.find_element(:css, '#employment-info-view .dl-horizontal dd:nth-child(2)').text + '"'
+  wait_for_element_to_be_visible(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]', 10)
+  result = @driver.find_element(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]').text.include?(status_array[custom_struct.status])
+  message = '"' + @driver.find_element(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]').text + '"'
   report_test_result("Edit Employment Information - Employment Status", result, message)
-
 end
 
 def verify_ach_information(ach_information)
@@ -224,17 +295,25 @@ def verify_ach_information(ach_information)
     type = 'Savings'
   end
 
-  result = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
-  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
-  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
-  result = result && @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
+  wait_for_element_to_be_visible(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]', 10)
 
-  report_test_result("Edit ACH Information", result, "")
+  if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+    report_test_result("Edit ACH Information", false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text)
+  elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
+    report_test_result("Edit ACH Information", false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text)
+  elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
+    report_test_result("Edit ACH Information", false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text)
+  elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
+    report_test_result("Edit ACH Information", false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text)
+  elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
+    report_test_result("Edit ACH Information", false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text)
+  else
+    report_test_result("Edit ACH Information", true, "")
+  end
 end
 
 def verify_log_outbound_call(hash)
-  sleep 3
+  wait_for_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div', 10)
 
   result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(hash)
   message = "Message: " + hash
@@ -243,7 +322,7 @@ def verify_log_outbound_call(hash)
 end
 
 def verify_log_inbound_call(hash)
-  sleep 2
+  wait_for_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div', 10)
 
   result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(hash)
   message = "Message: " + hash
@@ -252,22 +331,41 @@ def verify_log_inbound_call(hash)
 end
 
 def verify_withdraw_lead()
-  sleep 4
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Withdrawn')
   report_test_result("Withdraw Lead", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
 
 def verify_set_agent_verified()
-  sleep 2
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Agent Verified')
   report_test_result("Set Agent Verified", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
 
 def verify_decline_manual_review()
-  sleep 2
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
   result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Decline Manual Review')
   report_test_result("Decline Manual Review", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
 end
+
+def verify_set_false_positive()
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Reviewed False Positive')
+  report_test_result("Set False Positive", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
+end
+
+def verify_set_pre_funding()
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Pre Funding')
+  report_test_result("Set Pre-Funding", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
+end
+
+def verify_fund()
+  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
+  result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Funded')
+  report_test_result("Fund", result, "Lead State: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text)
+end
+
 
 # def edit_employment_information_employment_status(status)
 #   status_array = {}

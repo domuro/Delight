@@ -73,5 +73,9 @@ def report_test_result(test_name, status, message)
     status_string = "FAILURE"
   end
 
+  if !message or message == ""
+    message = "No message"
+  end
+  
   puts "[" + status_string + "] " + test_name + ": " + message
 end
