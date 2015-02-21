@@ -33,6 +33,23 @@ login()
 @lead_states[:decline_manual_review] = "decline_manual_review"
 # @lead_states[:abandoned_pre_qual] = "abandoned_pre_qual" #untestable?
 
+def test_login()
+  login("", "")
+  verify_login("Username is required.")
+
+  login("username", "")
+  verify_login("Password is required.")
+
+  login("", "password")
+  verify_login("Username is required.")
+
+  login("username", "password")
+  verify_login("Invalid username and password.")
+
+  login("dgee", "N1nja123")
+  verify_login("Welcome to Delight!")
+end
+
 def test_lead_state(lead_state)
   puts "state: " + lead_state
   navigate_to_lead(lead_state)
