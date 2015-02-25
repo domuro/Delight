@@ -64,9 +64,27 @@ def generate_ach_information_structs(type_array, holder, institution, account_nu
   return leadsArray
 end
 
+# Print congregate multiple test results into one result
+def report_test_results(test_name, results)
+  status = true
+  message = ""
+  for result in results
+    status = status and result[0]
+
+    if (result[1].is_a?(Array))
+      for m in result[1]
+        message += m.to_s + "\n"
+      end
+    else
+      message += result[1] + "; "
+    end
+  end
+
+  report_test_result(test_name, status, message)
+end
+
 # Print a test result to console
 def report_test_result(test_name, status, message)
-
   if status == true
     status_string = "SUCCESS"
   else
@@ -76,6 +94,14 @@ def report_test_result(test_name, status, message)
   if !message or message == ""
     message = "No message"
   end
-  
+
+  if (message.is_a?(Array))
+    temp = ""
+    for m in message
+      temp += m.to_s + "\n"
+    end
+    message = temp
+  end
+
   puts "[" + status_string + "] " + test_name + ": " + message
 end

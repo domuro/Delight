@@ -1,18 +1,28 @@
 require_relative "helper_methods"
 
-def login()
-  un = "dgee"
-  pw = "N1nja123"
+def test_login()
+  test_name = "test_login"
+  results = []
+  begin
+    login("", "")
+    results.push(verify_login("You need to sign in before continuing."))
 
-  username_field = @driver.find_element(:id, 'user_username')
-  username_field.send_keys un
+    login("username", "")
+    results.push(verify_login("Invalid email or password."))
 
-  password_field = @driver.find_element(:id, 'user_password')
-  password_field.send_keys pw
+    login("", "password")
+    results.push(verify_login("You need to sign in before continuing."))
 
-  submit_button = @driver.find_element(:name,'commit')
-  submit_button.click
+    login("username", "password")
+    results.push(verify_login("Invalid email or password."))
 
+    login("dgee", "N1nja123")
+    results.push(verify_login("Signed in successfully."))
+
+    report_test_results(test_name, results)
+  rescue
+    report_test_result(test_name, false, $!.backtrace)
+  end
 end
 
 def login(un, pw)
@@ -26,8 +36,9 @@ def login(un, pw)
   submit_button.click
 end
 
-def verify_login(alert_message)
-  wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-  result = @driver.find_element(:xpath, '//*[@id="alerts-container"]/div').text.include?(alert_message)
-  report_test_result("Login", result, @driver.find_element(:xpath, '//*[@id="alerts-container"]/div').text)
-end
+private
+  def verify_login(alert_message)
+    wait_for_element(:xpath, '/html/body/div[2]/div[1]/ul/li', 10)
+    result = @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text.include?(alert_message)
+    report_test_result("Login", result, @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text)
+  end

@@ -3,9 +3,6 @@ require_relative "login_page_test"
 require_relative "individual_lead"
 require_relative "lead_search"
 
-open_browser
-login()
-
 # TEST CASES
 @lead_states = {}
 @lead_states[:offer_shown] = "offer_shown"
@@ -33,94 +30,71 @@ login()
 @lead_states[:decline_manual_review] = "decline_manual_review"
 # @lead_states[:abandoned_pre_qual] = "abandoned_pre_qual" #untestable?
 
-def test_login()
-  login("", "")
-  verify_login("Username is required.")
-
-  login("username", "")
-  verify_login("Password is required.")
-
-  login("", "password")
-  verify_login("Username is required.")
-
-  login("username", "password")
-  verify_login("Invalid username and password.")
-
-  login("dgee", "N1nja123")
-  verify_login("Welcome to Delight!")
+def test_login_page()
+  test_login()
 end
 
 def test_lead_state(lead_state)
-  puts "state: " + lead_state
   navigate_to_lead(lead_state)
 
   ### ACTIONS ###
-  # test_log_outbound_call()
+  test_log_outbound_call()
   #
   # inbound_hash = "asdf"
   # log_inbound_call("111111", "2", "4", inbound_hash)
   # verify_log_inbound_call(inbound_hash)
 
   ### INFORMATION ###
-  begin
-    employmentInfoArray = generate_employement_information_structs(['1','3','6'], 'Bob', '2', 'tenure', 'phone', 'ext', 'email', 'addr', 'city', ['CA', 'WA'], 'postal', 'url')
-    edit_employment_information(employmentInfoArray)
-  rescue
-    report_test_result("Edit Employment Information - Employment Status", false, $!.to_s)
-  end
-
-  begin
-    achInfoArray = generate_ach_information_structs(['account-type-checking','account-type-savings'], 'SHAMLA SHARMA', 'CHASE', '424913244', '324123498')
-    edit_ach_information(achInfoArray)
-  rescue
-    report_test_result("Edit ACH Information", false, $!.to_s)
-  end
+  # test_edit_employment_information()
+  # test_edit_ach_information()
 
   # ### INFREQUENT ACTIONS ###
   # # Test withdraw_lead()
   # lead_states_allowing_withdraw = [@lead_states[:decline], @lead_states[:withdrawn], @lead_states[:duplicate_recent_applicant], @lead_states[:not_qualified_nonoperating_state]]
   # if !lead_states_allowing_withdraw.include?(lead_state)
   #   navigate_to_lead(lead_state)
-  #   withdraw_lead()
-  #   verify_withdraw_lead()
+  #   test_withdraw_lead()
   # end
   #
   # # Test set_agent_verified()
   # if lead_state.eql?(@lead_states[:agent_verification_pending])
   #   navigate_to_lead(lead_state)
-  #   set_agent_verified()
-  #   verify_set_agent_verified()
+  #   test_set_agent_verified()
   # end
   #
   # # Test decline_manual_review()
   # if lead_state.eql?(@lead_states[:agent_verification_pending])
   #   navigate_to_lead(lead_state)
-  #   decline_manual_review()
-  #   verify_decline_manual_review()
+  #   test_decline_manual_review()
   # end
   #
   # # Test set_false_positive()
   # if lead_state.eql?(@lead_states[:review])
   #   navigate_to_lead(lead_state)
-  #   set_false_positive()
-  #   verify_set_false_positive()
+  #   test_set_false_positive()
   # end
   #
   # # Test set_pre_funding()
   # if lead_state.eql?(@lead_states[:e_sign_promissory_signed])
   #   navigate_to_lead(lead_state)
-  #   set_pre_funding()
-  #   verify_set_pre_funding()
+  #   test_set_pre_funding()
   # end
   #
   # # Test fund()
   # if lead_state.eql?(@lead_states[:pre_funding])
   #   navigate_to_lead(lead_state)
-  #   fund()
-  #   verify_fund()
+  #   test_fund()
   # end
 end
 
-test_lead_state(@lead_states[:agent_verification_pending])
+open_browser
+login("dgee", "N1nja123")
+# test_login_page()
+
+for state in ARGV
+  test_lead_state(state)
+end
+
+# test_lead_state(@lead_states[:agent_verification_pending])
 # test_lead_state(@lead_states[:e_sign_promissory_signed])
 # test_lead_state(@lead_states[:pre_funding])
