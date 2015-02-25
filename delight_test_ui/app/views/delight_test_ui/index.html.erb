@@ -1,0 +1,78 @@
+<div id="container">
+  <div class="row">
+    <div id="case-branches" class="col-xs-3 left-col">
+      
+    </div>
+    <div class="col-xs-9 right-col">
+      <div class="row top">
+        <div class="col-xs-12">
+          <div id="view-welcome">
+
+            <h1><strong>Welcome!</strong></h1>
+            <h2>Select your test scripts and<br />click 'Run' to get started.</h2>
+          </div>
+
+          <div id="view-running">
+            <h1><strong>Running Scripts...</strong></h1>
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
+            <h2>Please wait.</h2>
+          </div>
+
+          <div id="view-saved">
+            <h1><strong>Saved!</strong></h1>
+            <h2>You may view the file at:<br /><span class="saved-path">saved-path</span></h2>
+          </div>
+
+          <div id="view-results">
+            <h1><strong>76% Passed</strong></h1>
+            <h2>6/8 Tests</h2>
+            <div id="passed" class="results">
+              <h2>Passed</h2>
+              <ul>
+                <li>Login > Blank username and blank password</li>
+                <li>Login > Non-blank username and blank password</li>
+                <li>Login > Blank username and non-blank password</li>
+                <li>Customer Lead Details > Offer Shown</li>
+                <li>Customer Lead Details > Review/li>
+                <li>Customer Lead Details > Withdrawn</li>
+                <li>Customer Lead Details > Duplicate Recent Applicant</li>
+              </ul>
+            </div>
+            <div id="failed" class="results">
+                <h2>Failed</h2>
+                <ul>
+                  <li>Login > Valid username and non-blank password</li>
+                  <li>Login > Valid username and valid password</li>
+                  <li>Customer Lead Details > Pre-Qual Shown</li>
+                  <li>Customer Lead Details > Agent Verification Pending</li>
+                  <li>Customer Lead Details > Decline</li>
+                </ul>
+            </div>
+
+          </div>
+
+        </div>  
+      </div>
+
+      <div class="row bottom">
+        <div class="col-xs-8 col-centered">
+          <div class="row">
+            <div class="col-xs-4">
+              <button id="run" class="active">Run</button>
+            </div>
+            <div class="col-xs-4">
+              <button id="reset" class="inactive">Reset</button>
+            </div>
+            <div class="col-xs-4">
+              <button id="save" class="inactive">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

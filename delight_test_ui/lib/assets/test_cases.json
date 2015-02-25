@@ -1,0 +1,105 @@
+{
+  "test_cases": [
+    { 
+      "title": "Login",
+      "cases": [
+        { 
+          "title": "Blank username and blank password",
+          "case": "blank_un_blank_pw"
+        }, {
+          "title": "Non-blank username and blank password",
+          "case": "nonblank_un_blank_pw"
+        }, {
+          "title": "Blank username and non-blank password",
+          "case": "blank_un_nonblank_pw"
+        }, {
+          "title": "Valid username and non-blank password",
+          "case": "valid_un_nonblank_pw"
+        }, {
+          "title": "Valid username and valid password",
+          "case": "valid_un_valid_pw"
+        }
+      ]
+    }, {
+      "title": "Customer Lead Details",
+      "cases": [
+        { 
+          "title": "Offer Shown",
+          "case": "offer_shown"
+        }, {
+          "title": "Pre-Qual Shown",
+          "case": "pre_qual_shown"            
+        }, {
+          "title": "Agent Verification Pending",
+          "case": "agent_verification_pending"            
+        }, {
+          "title": "Decline",
+          "case": "decline"            
+        }, {
+          "title": "Review",
+          "case": "review"            
+        }, {
+          "title": "Withdrawn",
+          "case": "withdrawn"            
+        }, {
+          "title": "Duplicate Recent Applicant",
+          "case": "duplicate_recent_applicant"            
+        }, {
+          "title": "Abandoned Credit Score Notice",
+          "case": "abandoned_credit_score_notice"            
+        }, {
+          "title": "Not Qualified Nonoperating State",
+          "case": "not_qualified_nonoperating_state"            
+        }, {
+          "title": "Abandoned Loan Details",
+          "case": "abandoned_loan_details"            
+        }, {
+          "title": "Offer Generated",
+          "case": "offer_generated"            
+        }, {
+          "title": "Abandoned Til",
+          "case": "abandoned_til"            
+        }, {
+          "title": "E-Sign Promissory Signed",
+          "case": "esign_promissory_signed"            
+        }, {
+          "title": "Reviewed False Positive",
+          "case": "reviewed_false_positive"            
+        }, {
+          "title": "Pre-Funding",
+          "case": "pre_funding"            
+        }, {
+          "title": "E-Sign Promissory Shown",
+          "case": "esign_promissory_shown"            
+        }, {
+          "title": "Loan Confirmation Shown",
+          "case": "loan_confirmation_shown"            
+        }, {
+          "title": "Abandoned ACH",
+          "case": "abandoned_ach"            
+        }, {
+          "title": "E-Sign Borrower Pending",
+          "case": "esign_borrower_pending"            
+        }, {
+          "title": "E-Sign Borrower Shown",
+          "case": "esign_borrower_shown"            
+        }, {
+          "title": "Funded",
+          "case": "funded"            
+        }, {
+          "title": "Agent Verified",
+          "case": "agent_verified"            
+        }, {
+          "title": "Decline Manual Review",
+          "case": "decline_manual_review"            
+        }, {
+          "title": "Abandoned Pre-Qual",
+          "case": "abandoned_pre_qual"            
+        }
+      ]
+    }, {
+      "title": "Customer Lead Search Results",
+      "cases": []
+    }
+  ] 
+}
