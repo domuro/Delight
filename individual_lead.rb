@@ -6,9 +6,9 @@ def test_log_outbound_call()
   results = []
 
   begin
-    phone_number_inputs = ["valid_input"]
-    disposition_inputs = ["2"]
-    notes_inputs = ["This is a valid note."]
+    phone_number_inputs = ["valid_input",""]
+    disposition_inputs = ["2","1"]
+    notes_inputs = ["This is a valid note.",""]
     submit_type_inputs = ["disconnected", "wrong_number", "no_answer_busy", "left_voicemail", "log_call"]
 
     for phone_number in phone_number_inputs
@@ -141,8 +141,8 @@ private
     phone_number_field.clear()
     phone_number_field.send_keys phone_number
 
+    wait_for_element_to_be_visible(:id, 'call_log_disposition', 5);
     click_button(:css, '#call_log_disposition')
-    sleep 1
     wait_for_element_to_be_visible(:xpath, '//*[@id="call_log_disposition"]/option[' + disposition_num + ']', 5);
     click_button(:xpath, '//*[@id="call_log_disposition"]/option[' + disposition_num + ']')
 
@@ -178,7 +178,10 @@ private
     note_field.clear()
     note_field.send_keys note
 
-    click_button(:css, "#call-log-form input[data-submit-action=log_call]")
+    note_field.submit
+    # click_button(:css, "#call-log-form input[data-submit-action=log_call]")
+    sleep 2
+    # wait_for_element_to_be_visible(:css, "#customer-lead panel.panel-default.panel-log-call.ng-hide:nth-child(1)", 5)
   end
 
   def edit_employment_information(employmentInfo)
@@ -370,20 +373,20 @@ private
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
       rescue
-        return false, $!.backtrace
+        return false,"", $!.backtrace
       end
     elsif disposition == "1"
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
       rescue
-        return false, $!.backtrace
+        return false,"", $!.backtrace
       end
     elsif submit_type == 'log_call'
       if note == ""
         begin
           get_element(:css, '#call-log-form .form-group:nth-child(3).has-error')
         rescue
-          return false, $!.backtrace
+          return false, "", $!.backtrace
         end
       else
         # wait_for_element(:css, '#customer-lead > div.panel.panel-default.panel-log-call.affix.ng-hide', 10)

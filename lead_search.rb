@@ -3,7 +3,7 @@ require_relative "helper_methods"
 # Actions
 def navigate_to_lead(lead_state)
   click_button(:link, "Leads")
-  click_button(:xpath, '//*[@id="preset-date-ranges"]/li[2]/a')
+  # click_button(:xpath, '//*[@id="preset-date-ranges"]/li[2]/a')
   lead_search_filter(lead_state)
   select_lead(lead_state)
 end

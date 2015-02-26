@@ -38,48 +38,48 @@ def test_lead_state(lead_state)
   navigate_to_lead(lead_state)
 
   ### ACTIONS ###
-  test_log_outbound_call()
+  # test_log_outbound_call()
   #
-  # inbound_hash = "asdf"
-  # log_inbound_call("111111", "2", "4", inbound_hash)
-  # verify_log_inbound_call(inbound_hash)
+  inbound_hash = "asdf"
+  log_inbound_call("111111", "2", "4", inbound_hash)
+  verify_log_inbound_call(inbound_hash)
 
   ### INFORMATION ###
   # test_edit_employment_information()
   # test_edit_ach_information()
 
-  # ### INFREQUENT ACTIONS ###
-  # # Test withdraw_lead()
+  ### INFREQUENT ACTIONS ###
+  # Test withdraw_lead()
   # lead_states_allowing_withdraw = [@lead_states[:decline], @lead_states[:withdrawn], @lead_states[:duplicate_recent_applicant], @lead_states[:not_qualified_nonoperating_state]]
   # if !lead_states_allowing_withdraw.include?(lead_state)
   #   navigate_to_lead(lead_state)
   #   test_withdraw_lead()
   # end
-  #
+  
   # # Test set_agent_verified()
   # if lead_state.eql?(@lead_states[:agent_verification_pending])
   #   navigate_to_lead(lead_state)
   #   test_set_agent_verified()
   # end
-  #
+  
   # # Test decline_manual_review()
   # if lead_state.eql?(@lead_states[:agent_verification_pending])
   #   navigate_to_lead(lead_state)
   #   test_decline_manual_review()
   # end
-  #
+  
   # # Test set_false_positive()
   # if lead_state.eql?(@lead_states[:review])
   #   navigate_to_lead(lead_state)
   #   test_set_false_positive()
   # end
-  #
+  
   # # Test set_pre_funding()
   # if lead_state.eql?(@lead_states[:e_sign_promissory_signed])
   #   navigate_to_lead(lead_state)
   #   test_set_pre_funding()
   # end
-  #
+  
   # # Test fund()
   # if lead_state.eql?(@lead_states[:pre_funding])
   #   navigate_to_lead(lead_state)
