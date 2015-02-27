@@ -69,11 +69,11 @@ def report_test_results(test_name, results)
   status = true
   message = ""
   for result in results
-    status = status and result[0]
-
+    # print ("Status: "+result[0].to_s+"\n")
+    status = (status && result[0])
     if (result[1].is_a?(Array))
       for m in result[1]
-        message += m.to_s + "\n"
+        message += m.to_s + "\n\t"
       end
     else
       message += result[1] + "; "

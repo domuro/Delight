@@ -7,9 +7,9 @@ def test_log_outbound_call()
 
   begin
     phone_number_inputs = ["valid_input",""]
-    disposition_inputs = ["2","1"]
+    disposition_inputs = ["Welcome Call", "Select a Disposition"]
     notes_inputs = ["This is a valid note.",""]
-    submit_type_inputs = ["disconnected", "wrong_number", "no_answer_busy", "left_voicemail", "log_call"]
+    submit_type_inputs = ["disconnected", "left_voicemail", "log_call"]
 
     for phone_number in phone_number_inputs
       for disposition in disposition_inputs
@@ -25,9 +25,43 @@ def test_log_outbound_call()
   rescue
     report_test_result(test_name, false, $!.backtrace)
   end
+
+  begin
+    click_button(:xpath, '//*[@id="customer-lead"]/div[1]/div[1]/a');
+  rescue
+  end
+
 end
 
 def test_log_inbound_call()
+  test_name = "test_log_inbound_call"
+  results = []
+
+  begin
+    phone_number_inputs = ["valid_input", ""]
+    phone_number_types = ["Mobile", "Work"]
+    disposition_inputs = ["Select a Disposition", "Verification"]
+    notes_inputs = ["This is a valid note.", ""]
+
+    for phone_number in phone_number_inputs
+      for phone_number_type in phone_number_types
+        for disposition in disposition_inputs
+          for note in notes_inputs
+            log_inbound_call(phone_number, phone_number_type, disposition, note)
+            results.push(verify_log_inbound_call(phone_number, phone_number_type, disposition, note))
+          end
+        end
+      end
+    end
+    report_test_results(test_name, results)
+  rescue
+    report_test_result(test_name, false, $!.backtrace)
+  end
+
+  begin
+    click_button(:xpath, '//*[@id="customer-lead"]/div[1]/div[1]/a');
+  rescue
+  end
 end
 
 def test_edit_employment_information()
@@ -131,20 +165,19 @@ private
 
   # submit_type options:
   #   disconnected, wrong_number, no_answer_busy, left_voicemail, log_call
-  def log_outbound_call(phone_number, disposition_num, note, submit_type)
+  def log_outbound_call(phone_number, disposition, note, submit_type)
     click_button(:css, "#actions .actions .panel:nth-child(1) button")
 
     wait_for_element(:id, "call_log_phone_number", 5)
-    wait_for_element_to_be_visible(:id, "call_log_phone_number", 5);
+    wait_for_element_to_be_visible(:id, "call_log_phone_number", 5)
 
     phone_number_field = @driver.find_element(:id, "call_log_phone_number")
     phone_number_field.clear()
     phone_number_field.send_keys phone_number
 
-    wait_for_element_to_be_visible(:id, 'call_log_disposition', 5);
-    click_button(:css, '#call_log_disposition')
-    wait_for_element_to_be_visible(:xpath, '//*[@id="call_log_disposition"]/option[' + disposition_num + ']', 5);
-    click_button(:xpath, '//*[@id="call_log_disposition"]/option[' + disposition_num + ']')
+    menu = get_element(:xpath, '//*[@id="call_log_disposition"]')
+    option = Selenium::WebDriver::Support::Select.new(menu)
+    option.select_by(:text, disposition)
 
     note_field = @driver.find_element(:id, "call_log_notes")
     note_field.clear()
@@ -158,30 +191,29 @@ private
     end
   end
 
-  def log_inbound_call(phone_number, phone_type, disposition_num, note)
-    click_button(:css, "#actions .actions .panel:nth-child(2) button")
+  def log_inbound_call(phone_number, phone_type, disposition, note)
+    click_button(:xpath, '//*[@id="common-actions"]/div[2]/button')
 
     wait_for_element(:id, "call_log_phone_number", 5)
-    wait_for_element_to_be_visible(:id, "call_log_phone_number", 5);
+    wait_for_element_to_be_visible(:id, "call_log_phone_number", 5)
 
     phone_number_field = @driver.find_element(:id, "call_log_phone_number")
     phone_number_field.clear()
     phone_number_field.send_keys phone_number
 
-    click_button(:css, "#phone_type")
-    click_button(:css, '#phone_type option:nth-child(' + phone_type +')')
+    menu = get_element(:css, "#phone_type")
+    option = Selenium::WebDriver::Support::Select.new(menu)
+    option.select_by(:text, phone_type)
 
-    click_button(:css, '#call_log_disposition')
-    click_button(:css, '#call_log_disposition option:nth-child(' + disposition_num +')')
+    menu = get_element(:css, '#call_log_disposition')
+    option = Selenium::WebDriver::Support::Select.new(menu)
+    option.select_by(:text, disposition)
 
     note_field = @driver.find_element(:id, "call_log_notes")
     note_field.clear()
     note_field.send_keys note
 
-    note_field.submit
-    # click_button(:css, "#call-log-form input[data-submit-action=log_call]")
-    sleep 2
-    # wait_for_element_to_be_visible(:css, "#customer-lead panel.panel-default.panel-log-call.ng-hide:nth-child(1)", 5)
+    click_button(:xpath, '//*[@id="call-log-form"]/div[5]/div/div/input')
   end
 
   def edit_employment_information(employmentInfo)
@@ -254,8 +286,11 @@ private
     click_button(:xpath, '//*[@id="'+achInfo.type+'"]')
 
     if (achInfo.holder != nil)
-      @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').clear()
-      @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').send_keys achInfo.holder
+      begin
+        @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').clear()
+        @driver.find_element(:xpath, '//*[@id="bank-account-holder-name"]').send_keys achInfo.holder
+      rescue
+      end
     end
 
     if (achInfo.institution != nil)
@@ -273,7 +308,11 @@ private
       @driver.find_element(:xpath, '//*[@id="routing-number"]').send_keys achInfo.routing_number
     end
 
-    @driver.find_element(:xpath, '//*[@id="form-ach-info"]/div[7]/div/input').submit
+    begin
+      @driver.find_element(:xpath, '//*[@id="form-ach-info"]/div[7]/div/input').submit
+    rescue
+      click_button(:xpath, '//*[@id="form-ach-info"]/div[6]/div/input')
+    end
   end
 
   def withdraw_lead()
@@ -350,32 +389,45 @@ private
 
     wait_for_element_to_be_visible(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]', 10)
 
-    if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
-    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
-    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
-    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
-    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
+    if get_element(:xpath, '//*[@id="lead-state-label"]').text.eql?("Review")
+      if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.institution)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.account_number[-4..-1])
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.routing_number)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+      else
+        return true, ""
+      end
     else
-      return true, ""
+      if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
+        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
+      else
+        return true, ""
+      end
     end
   end
 
   def verify_log_outbound_call(phone_number, disposition, note, submit_type)
     submit_type_keys = {'disconnected' => 'Disconnected', 'wrong_number' => 'Wrong Number', 'no_answer_busy' => 'No Answer Busy',
                         'left_voicemail' => 'Left Voicemail'}
-
     if phone_number == ""
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
       rescue
         return false,"", $!.backtrace
       end
-    elsif disposition == "1"
+    elsif disposition == "Select a Disposition"
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
       rescue
@@ -384,7 +436,7 @@ private
     elsif submit_type == 'log_call'
       if note == ""
         begin
-          get_element(:css, '#call-log-form .form-group:nth-child(3).has-error')
+          get_element(:css, '#call-log-form .form-group.has-error')
         rescue
           return false, "", $!.backtrace
         end
@@ -405,13 +457,33 @@ private
     return true, ""
   end
 
-  def verify_log_inbound_call(hash)
-    wait_for_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div', 10)
-
-    result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(hash)
-    message = "Message: " + hash
-
-    report_test_result("Log Inbound Call", result, message)
+  def verify_log_inbound_call(phone_number, phone_number_type, disposition, note)
+    if phone_number == ""
+      begin
+        get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
+      rescue
+        return false,"", $!.backtrace
+      end
+    elsif disposition == "Select a Disposition"
+      begin
+        get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
+      rescue
+        return false,"", $!.backtrace
+      end
+    elsif note == ""
+      begin
+        get_element(:css, '#call-log-form .form-group.has-error')
+      rescue
+        return false, "", $!.backtrace
+      end
+    else
+      # wait_for_element(:css, '#customer-lead > div.panel.panel-default.panel-log-call.affix.ng-hide', 10)
+      sleep 2
+      result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(note)
+      message = "Message: " + note
+      return result, message
+    end
+    return true, ""
   end
 
   def verify_withdraw_lead()
