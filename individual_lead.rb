@@ -319,7 +319,6 @@ private
     click_button(:xpath, '//*[@id="common-actions"]/div[1]/a')
     wait_for_element_to_be_visible(:xpath, '//*[@id="lead-state-edit"]/div[3]/button', 5)
     click_button(:xpath, '//*[@id="lead-state-edit"]/div[3]/button')
-
     @driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoAlertOpenError
   end
 
@@ -389,33 +388,33 @@ private
 
     wait_for_element_to_be_visible(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]', 10)
 
-    if get_element(:xpath, '//*[@id="lead-state-label"]').text.eql?("Review")
-      if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.institution)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.account_number[-4..-1])
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.routing_number)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
-      else
-        return true, ""
-      end
+    # if get_element(:xpath, '//*[@id="lead-state-label"]').text.eql?("Review")
+    #   if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.institution)
+    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.account_number[-4..-1])
+    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.routing_number)
+    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+    #   else
+    #     return true, ""
+    #   end
+    # else
+    if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
+      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
+      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
+      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
+      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+    elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
+      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
     else
-      if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
-      elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
-        return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
-      else
-        return true, ""
-      end
+      return true, ""
     end
+    # end
   end
 
   def verify_log_outbound_call(phone_number, disposition, note, submit_type)

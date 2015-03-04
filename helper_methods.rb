@@ -85,7 +85,6 @@ def report_test_results(test_name, results)
 end
 
 
-@test_report = {"success" => [], "failure" => []}
 
 # Print a test result to console
 def report_test_result(test_name, status, message)
@@ -107,11 +106,15 @@ def report_test_result(test_name, status, message)
     message = temp
   end
 
-  @test_report[status_string].push({"test_name" => test_name, "message" => message})
-  puts "[" + status_string + "] " + test_name + ": " + message
+  if(!$test_report)
+    $test_report = {"success" => [], "failure" => []}
+  end
+
+  $test_report[status_string].push({"test_name" => test_name, "lead_state" => @lead_state, "message" => message})
+  puts "[" + status_string + "] " + @lead_state + " > "+ test_name + ": " + message
 end
 
 def write_results_to_file(filename)
-  results = @test_report.to_json
+  results = $test_report.to_json
   File.open(filename, 'w') { |file| file.write(results) }
 end
