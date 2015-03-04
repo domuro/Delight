@@ -1,5 +1,6 @@
-require "selenium-webdriver"
+require 'selenium-webdriver'
 require 'io/console'
+require 'json'
 
 def open_browser
   @driver = Selenium::WebDriver.for :firefox
@@ -83,12 +84,15 @@ def report_test_results(test_name, results)
   report_test_result(test_name, status, message)
 end
 
+
+@test_report = {"success" => [], "failure" => []}
+
 # Print a test result to console
 def report_test_result(test_name, status, message)
   if status == true
-    status_string = "SUCCESS"
+    status_string = "success"
   else
-    status_string = "FAILURE"
+    status_string = "failure"
   end
 
   if !message or message == ""
@@ -103,5 +107,11 @@ def report_test_result(test_name, status, message)
     message = temp
   end
 
+  @test_report[status_string].push({"test_name" => test_name, "message" => message})
   puts "[" + status_string + "] " + test_name + ": " + message
+end
+
+def write_results_to_file(filename)
+  results = @test_report.to_json
+  File.open(filename, 'w') { |file| file.write(results) }
 end

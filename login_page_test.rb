@@ -40,5 +40,5 @@ private
   def verify_login(alert_message)
     wait_for_element(:xpath, '/html/body/div[2]/div[1]/ul/li', 10)
     result = @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text.include?(alert_message)
-    report_test_result("Login", result, @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text)
+    return result, ""
   end

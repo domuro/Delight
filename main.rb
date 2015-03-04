@@ -4,6 +4,15 @@ require_relative "individual_lead"
 require_relative "lead_search"
 
 # TEST CASES
+# File.open(filename, 'r') do |f|
+#   test_cases = JSON.parse(f)
+#   test_cases["test_cases"].each do |test_branch|
+#     test_branch["cases"].each do |test_case|
+#       test_case["case"]
+#     end
+#   end
+# end
+
 @lead_states = {}
 @lead_states[:offer_shown] = "offer_shown"
 @lead_states[:pre_qual_shown] = "pre_qual_shown"
@@ -30,6 +39,14 @@ require_relative "lead_search"
 @lead_states[:decline_manual_review] = "decline_manual_review"
 # @lead_states[:abandoned_pre_qual] = "abandoned_pre_qual" #untestable?
 
+def test(test_name)
+  if test_name.downcase.eql?("login")
+    test_login_page()
+  else
+    test_lead_state(test_name)
+  end
+end
+
 def test_login_page()
   test_login()
 end
@@ -42,56 +59,65 @@ def test_lead_state(lead_state)
   test_log_inbound_call()
 
   ### INFORMATION ###
-  # test_edit_employment_information()
-  # test_edit_ach_information()
+  test_edit_employment_information()
+  test_edit_ach_information()
 
   # ### INFREQUENT ACTIONS ###
-  # # Test withdraw_lead()
-  # lead_states_allowing_withdraw = [@lead_states[:decline], @lead_states[:withdrawn], @lead_states[:duplicate_recent_applicant], @lead_states[:not_qualified_nonoperating_state]]
-  # if !lead_states_allowing_withdraw.include?(lead_state)
-  #   navigate_to_lead(lead_state)
-  #   test_withdraw_lead()
-  # end
-  #
-  # # Test set_agent_verified()
-  # if lead_state.eql?(@lead_states[:agent_verification_pending])
-  #   navigate_to_lead(lead_state)
-  #   test_set_agent_verified()
-  # end
-  #
-  # # Test decline_manual_review()
-  # if lead_state.eql?(@lead_states[:agent_verification_pending])
-  #   navigate_to_lead(lead_state)
-  #   test_decline_manual_review()
-  # end
-  #
-  # # Test set_false_positive()
-  # if lead_state.eql?(@lead_states[:review])
-  #   navigate_to_lead(lead_state)
-  #   test_set_false_positive()
-  # end
-  #
-  # # Test set_pre_funding()
-  # if lead_state.eql?(@lead_states[:e_sign_promissory_signed])
-  #   navigate_to_lead(lead_state)
-  #   test_set_pre_funding()
-  # end
-  #
-  # # Test fund()
-  # if lead_state.eql?(@lead_states[:pre_funding])
-  #   navigate_to_lead(lead_state)
-  #   test_fund()
-  # end
+  # Test withdraw_lead()
+  lead_states_allowing_withdraw = [@lead_states[:decline], @lead_states[:withdrawn], @lead_states[:duplicate_recent_applicant], @lead_states[:not_qualified_nonoperating_state]]
+  if !lead_states_allowing_withdraw.include?(lead_state)
+    navigate_to_lead(lead_state)
+    test_withdraw_lead()
+  end
+
+  # Test set_agent_verified()
+  if lead_state.eql?(@lead_states[:agent_verification_pending])
+    navigate_to_lead(lead_state)
+    test_set_agent_verified()
+  end
+
+  # Test decline_manual_review()
+  if lead_state.eql?(@lead_states[:agent_verification_pending])
+    navigate_to_lead(lead_state)
+    test_decline_manual_review()
+  end
+
+  # Test set_false_positive()
+  if lead_state.eql?(@lead_states[:review])
+    navigate_to_lead(lead_state)
+    test_set_false_positive()
+  end
+
+  # Test set_pre_funding()
+  if lead_state.eql?(@lead_states[:e_sign_promissory_signed])
+    navigate_to_lead(lead_state)
+    test_set_pre_funding()
+  end
+
+  # Test fund()
+  if lead_state.eql?(@lead_states[:pre_funding])
+    navigate_to_lead(lead_state)
+    test_fund()
+  end
 end
 
 open_browser
-login("dgee", "N1nja123")
-# test_login_page()
+test_cases = []
 
-for state in ARGV
-  test_lead_state(state)
+for test_case in ARGV
+  test_cases.push(test_case)
+end
+test_cases.uniq!
+
+# index = test_cases.find_index("login")
+hash = Hash[test_cases.map.with_index.to_a]    # => {"a"=>0, "b"=>1, "c"=>2}
+index = hash["login"]
+if(index != nil)
+  test_cases[0], test_cases[index] = test_cases[index], test_cases[0]
+else
+  login("dgee", "N1nja123")
 end
 
-# test_lead_state(@lead_states[:agent_verification_pending])
-# test_lead_state(@lead_states[:e_sign_promissory_signed])
-# test_lead_state(@lead_states[:pre_funding])
+test_cases.each {|test_case| test(test_case)}
+
+write_results_to_file("test.txt")
