@@ -30,6 +30,8 @@ gem 'autoprefixer-rails'
 # Gon (pass Ruby variables to JS)
 gem 'gon', '~> 5.2.3'
 
+gem 'selenium-webdriver', '~> 2.45.0'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

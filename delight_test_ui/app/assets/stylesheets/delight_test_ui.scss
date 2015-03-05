@@ -69,6 +69,10 @@ $bottom-row-height: 150px;
   display: none !important;
 }
 
+.indent {
+  margin-left: 40px;
+}
+
 h1 {
   font-size: 36pt !important;
 }
@@ -141,16 +145,16 @@ button {
 
 #view-results {
   .results {
-    padding: 20px;
+    padding: 20px 20px 30px 20px;
     margin: 25px 0;
     border-radius: 10px;
   }
 
-  #passed {
+  #success {
     background-color: #bbf7a5;
   }
 
-  #failed {
+  #failure {
     background-color: #ffbfbf;
   }
 

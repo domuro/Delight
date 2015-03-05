@@ -2,26 +2,13 @@
   "test_cases": [
     { 
       "title": "Login",
-      "cases": [
-        { 
-          "title": "Blank username and blank password",
-          "case": "blank_un_blank_pw"
-        }, {
-          "title": "Non-blank username and blank password",
-          "case": "nonblank_un_blank_pw"
-        }, {
-          "title": "Blank username and non-blank password",
-          "case": "blank_un_nonblank_pw"
-        }, {
-          "title": "Valid username and non-blank password",
-          "case": "valid_un_nonblank_pw"
-        }, {
-          "title": "Valid username and valid password",
-          "case": "valid_un_valid_pw"
-        }
-      ]
+      "id": "login_branch",
+      "case": "login",
+      "cases": []
     }, {
       "title": "Customer Lead Details",
+      "id": "customer_lead_details_branch",
+      "case": "",
       "cases": [
         { 
           "title": "Offer Shown",
@@ -97,9 +84,6 @@
           "case": "abandoned_pre_qual"            
         }
       ]
-    }, {
-      "title": "Customer Lead Search Results",
-      "cases": []
     }
   ] 
 }
