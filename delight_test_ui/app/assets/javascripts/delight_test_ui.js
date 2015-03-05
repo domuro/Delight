@@ -123,17 +123,20 @@ function toggleButtonState(buttonsToMakeActive) {
 function initResults(result_type, json_results) {
   var li = "";
   var array_of_results = json_results[result_type]
+  var counter = 0;
 
   for (i in array_of_results) {
+    counter++;
+
     li += "<li>";
-    li += array_of_results[i].lead_state;
-    li += ": ";
+    li += "<span class=title>" + counter + ". " + array_of_results[i].lead_state + " - " + array_of_results[i].test_name + "</span>";
+    li += ": <br />";
 
     var msg =  array_of_results[i].message;
     msg = msg.replace(/\</g,"&lt;");
     msg = msg.replace(/\>/g,"&gt;") 
 
-    li += msg;
+    li += "<span class='message'>" + msg + "</span>";
     li += "</li>";
   }
 
