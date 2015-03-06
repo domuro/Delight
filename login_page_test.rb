@@ -41,6 +41,6 @@ private
     wait_for_element(:xpath, '/html/body/div[2]/div[1]/ul/li', 10)
     alert = @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text
     result = alert.include?(alert_message)
-    message = '{"Expected alert_message": alert_message, "Actual alert_message": #{alert}}'
-    return result, ""
+    message = "{\"Expected alert_message\": #{alert_message}, \"Actual alert_message\": #{alert}}"
+    return result, message
   end
