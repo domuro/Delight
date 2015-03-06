@@ -84,8 +84,6 @@ def report_test_results(test_name, results)
   report_test_result(test_name, status, message)
 end
 
-
-
 # Print a test result to console
 def report_test_result(test_name, status, message)
   if status == true
