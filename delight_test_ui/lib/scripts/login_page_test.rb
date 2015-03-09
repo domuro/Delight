@@ -39,6 +39,8 @@ end
 private
   def verify_login(alert_message)
     wait_for_element(:xpath, '/html/body/div[2]/div[1]/ul/li', 10)
-    result = @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text.include?(alert_message)
-    return result, ""
+    alert = @driver.find_element(:xpath, '/html/body/div[2]/div[1]/ul/li').text
+    result = alert.include?(alert_message)
+    message = "{\"Expected alert_message\": #{alert_message}, \"Actual alert_message\": #{alert}}"
+    return result, message
   end

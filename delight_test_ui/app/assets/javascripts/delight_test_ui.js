@@ -7,7 +7,8 @@ var init = {
   action_buttons: function() {
     $('#run').click(function() {
       if ($(this).hasClass('inactive')) { return; }
-
+      if (!$("#case-branches input:checked").length) { return alert('Please select one or more test cases.'); }
+      
       toggleViews('#view-running');
 
       runScripts(function(json_results) {
@@ -18,7 +19,7 @@ var init = {
         var total_scripts = json_results["success"].length + json_results["failure"].length;
         var percentage_passed = (parseFloat(json_results["success"].length / total_scripts)*100);
 
-        var title = percentage_passed + "% Passed";
+        var title = percentage_passed.toFixed(2) + "% Passed";
         var subtitle = json_results["success"].length + "/" + total_scripts + " Tests";
         updateResultsHeaders(title, subtitle);
 
@@ -125,6 +126,12 @@ function initResults(result_type, json_results) {
   var array_of_results = json_results[result_type]
   var counter = 0;
 
+  if (!array_of_results.length) {
+    $("#" + result_type).hide();
+    return;
+  } 
+  
+  $("#" + result_type).show();
   for (i in array_of_results) {
     counter++;
 
@@ -132,15 +139,22 @@ function initResults(result_type, json_results) {
     li += "<span class=title>" + counter + ". " + array_of_results[i].lead_state + " - " + array_of_results[i].test_name + "</span>";
     li += ": <br />";
 
-    var msg =  array_of_results[i].message;
-    msg = msg.replace(/\</g,"&lt;");
-    msg = msg.replace(/\>/g,"&gt;") 
+    var msg = array_of_results[i].message;
+    if ((typeof msg) === 'string') {
+      msg = msg.replace(/\</g,"&lt;");
+      msg = msg.replace(/\>/g,"&gt;");
+    }
+
+    msg = replaceAll("}; {","<br /><br />",msg);
+    msg = replaceAll("\"Actual","<br />\"Actual",msg);
+    msg = replaceAll("{","",msg);
+    msg = replaceAll("};","",msg);
+    msg = replaceAll("\"","",msg);
+    msg = replaceAll(",","",msg);
 
     li += "<span class='message'>" + msg + "</span>";
     li += "</li>";
   }
-
-
 
   $("#" + result_type + " ul").html(li);
 }
@@ -167,6 +181,19 @@ function toggleViews(viewToShow) {
     }
   });
 };
+
+function isJSON(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+function replaceAll(find, replace, str) {
+  return str.replace(new RegExp(find, 'g'), replace);
+}
 
 function runScripts(cb) {
   toggleButtonState(null);

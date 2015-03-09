@@ -373,9 +373,10 @@ private
     status_array['6'] = 'Retired'
     status_array['7'] = 'Other'
     # TODO: Make result report for each field of Employment Information
-    wait_for_element_to_be_visible(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]', 10)
-    result = @driver.find_element(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]').text.include?(status_array[custom_struct.status])
-    message = '"' + @driver.find_element(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]').text + '"'
+    wait_for_element_to_be_visible(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]', 20)
+    actual = @driver.find_element(:xpath, '//*[@id="employment-info-view"]/dl/dd[1]').text
+    result = actual.include?(status_array[custom_struct.status])
+    message = "{\"Expected employment_status\": #{status_array[custom_struct.status]}, \"Actual employment_status\": #{actual}}"
     return result, message
   end
 
@@ -388,33 +389,29 @@ private
 
     wait_for_element_to_be_visible(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]', 10)
 
-    # if get_element(:xpath, '//*[@id="lead-state-label"]').text.eql?("Review")
-    #   if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
-    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.institution)
-    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
-    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.account_number[-4..-1])
-    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
-    #   elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.routing_number)
-    #     return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
-    #   else
-    #     return true, ""
-    #   end
-    # else
     if !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text.include?(type)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+      actual_type = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[1]').text
+      message = "{\"Expected type\": #{type}, \"Actual type\": #{actual_type}}"
+      return false, message
     elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text.include?(ach_information.holder)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+      ach_holder = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[2]').text
+      message = "{\"Expected ach_holder\": #{ach_information.holder}, \"Actual ach_holder\": #{ach_holder}}"
+      return false, message
     elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text.include?(ach_information.institution)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+      ach_institution = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[3]').text
+      message = "{\"Expected ach_institution\": #{ach_information.institution}, \"Actual ach_holder\": #{ach_institution}}"
+      return false, message
     elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text.include?(ach_information.account_number[-4..-1])
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+      ach_account_number = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[4]').text
+      message = "{\"Expected ach_account_number (last 4 digits)\": #{ach_information.account_number[-4..-1]}, \"Actual ach_account_number (last 4 digits)\": #{ach_account_number}}"
+      return false, message
     elsif !@driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text.include?(ach_information.routing_number)
-      return false, @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
+      ach_routing_number = @driver.find_element(:xpath, '//*[@id="ach-info-view"]/dl/dd[5]').text
+      message = "{\"Expected ach_routing_number\": #{ach_information.routing_number}, \"Actual ach_routing_number\": #{ach_routing_number}}"
+      return false, message
     else
-      return true, ""
+      return true, "ACH Information updated correctly"
     end
-    # end
   end
 
   def verify_log_outbound_call(phone_number, disposition, note, submit_type)
@@ -424,36 +421,38 @@ private
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
       rescue
-        return false,"", $!.backtrace
+        return false, $!.backtrace
       end
     elsif disposition == "Select a Disposition"
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
       rescue
-        return false,"", $!.backtrace
+        return false, $!.backtrace
       end
     elsif submit_type == 'log_call'
       if note == ""
         begin
           get_element(:css, '#call-log-form .form-group.has-error')
         rescue
-          return false, "", $!.backtrace
+          return false, $!.backtrace
         end
       else
         # wait_for_element(:css, '#customer-lead > div.panel.panel-default.panel-log-call.affix.ng-hide', 10)
         sleep 2
-        result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(note)
-        message = "Message: " + note
+        actual_note = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text
+        result = actual_note.include?(note)
+        message = "{\"Expected note\": \"#{note}\", \"Actual note\": \"#{actual_note}\"}"
         return result, message
       end
     else
       # wait_for_element(:css, '#customer-lead > div.panel.panel-default.panel-log-call.affix.ng-hide', 10)
       sleep 2
-      result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(submit_type_keys[submit_type])
-      message = "Message: " + submit_type_keys[submit_type]
+      actual_note = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text
+      result = actual_note.include?(submit_type_keys[submit_type])
+      message = "{\"Expected note\": #{submit_type_keys[submit_type]}, \"Actual note\": #{actual_note}}"
       return result, message
     end
-    return true, ""
+    return true, "{ \"Expected result\": \"Log Outbound Forced-Error successful.\", \"Actual result\": \"Log Outbound Forced-Error successful.\"}"
   end
 
   def verify_log_inbound_call(phone_number, phone_number_type, disposition, note)
@@ -461,62 +460,75 @@ private
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(1).has-error')
       rescue
-        return false,"", $!.backtrace
+        return false, $!.backtrace
       end
     elsif disposition == "Select a Disposition"
       begin
         get_element(:css, '#call-log-form .form-group:nth-child(2).has-error')
       rescue
-        return false,"", $!.backtrace
+        return false, $!.backtrace
       end
     elsif note == ""
       begin
         get_element(:css, '#call-log-form .form-group.has-error')
       rescue
-        return false, "", $!.backtrace
+        return false, $!.backtrace
       end
     else
       # wait_for_element(:css, '#customer-lead > div.panel.panel-default.panel-log-call.affix.ng-hide', 10)
       sleep 2
-      result = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text.include?(note)
-      message = "Message: " + note
+      actual_note = @driver.find_element(:xpath, '//*[@id="notes-list"]/ul[1]/li/div').text
+      result = actual_note.include?(note)
+      message = "{\"Expected note\": \"#{note}\", \"Actual note\": \"#{actual_note}\"}"
       return result, message
     end
-    return true, ""
+    return true, "{ \"Expected result\": \"Log Inbound Forced-Error successful.\", \"Actual result\": \"Log Inbound Forced-Error successful.\"}"
   end
 
   def verify_withdraw_lead()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Withdrawn')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Withdrawn')
+    message = "{\"Expected lead_state\": Withdrawn, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end
 
   def verify_set_agent_verified()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Agent Verified')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Agent Verified')
+    message = "{\"Expected lead_state\": Agent Verified, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end
 
   def verify_decline_manual_review()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Decline Manual Review')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Decline Manual Review')
+    message = "{\"Expected lead_state\": Decline Manual Review, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end
 
   def verify_set_false_positive()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Reviewed False Positive')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Reviewed False Positive')
+    message = "{\"Expected lead_state\": Reviewed False Positive, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end
 
   def verify_set_pre_funding()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Pre Funding')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Pre Funding')
+    message = "{\"Expected lead_state\": Pre Funding, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end
 
   def verify_fund()
-    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 10)
-    result = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text.include?('Funded')
-    return result, "State changed to: " + @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    wait_for_element(:xpath, '//*[@id="alerts-container"]/div', 30)
+    actual_lead_state = @driver.find_element(:xpath, '//*[@id="lead-state-label"]').text
+    result = actual_lead_state.include?('Funded')
+    message = "{\"Expected lead_state\": Funded, \"Actual note\": #{actual_lead_state}}"
+    return result, message
   end

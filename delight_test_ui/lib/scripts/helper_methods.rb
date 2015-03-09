@@ -27,8 +27,9 @@ end
 # Wait for an element that is already in the DOM to become visible and interactable
 def wait_for_element_to_be_visible(id, name, time)
   begin
+    wait = [60, time].max
     element = get_element(id, name)
-    !time.times {
+    !wait.times {
       break if element.displayed?
       sleep 1
     }
@@ -83,8 +84,6 @@ def report_test_results(test_name, results)
 
   report_test_result(test_name, status, message)
 end
-
-
 
 # Print a test result to console
 def report_test_result(test_name, status, message)

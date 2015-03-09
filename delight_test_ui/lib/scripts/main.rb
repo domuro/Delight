@@ -3,16 +3,6 @@ require_relative "login_page_test"
 require_relative "individual_lead"
 require_relative "lead_search"
 
-# TEST CASES
-# File.open(filename, 'r') do |f|
-#   test_cases = JSON.parse(f)
-#   test_cases["test_cases"].each do |test_branch|
-#     test_branch["cases"].each do |test_case|
-#       test_case["case"]
-#     end
-#   end
-# end
-
 class Delight_Test
   def initialize(test_cases)
     @test_cases = test_cases
@@ -65,7 +55,11 @@ class Delight_Test
   end
 
   def test_lead_state(lead_state)
-    navigate_to_lead(lead_state)
+    begin
+      navigate_to_lead(lead_state)
+    rescue
+      puts "LEAD STATE NOT FOUND: #{lead_state}"
+    end
 
     ### ACTIONS ###
     test_log_outbound_call()
@@ -75,7 +69,7 @@ class Delight_Test
     test_edit_employment_information()
     test_edit_ach_information()
 
-    # ### INFREQUENT ACTIONS ###
+    ### INFREQUENT ACTIONS ###
     # Test withdraw_lead()
     lead_states_allowing_withdraw = [@lead_states[:decline], @lead_states[:withdrawn], @lead_states[:duplicate_recent_applicant], @lead_states[:not_qualified_nonoperating_state]]
     if !lead_states_allowing_withdraw.include?(lead_state)
@@ -122,7 +116,6 @@ for test_case in ARGV
 end
 test_cases.uniq!
 
-# index = test_cases.find_index("login")
 hash = Hash[test_cases.map.with_index.to_a]
 index = hash["login"]
 if(index != nil)

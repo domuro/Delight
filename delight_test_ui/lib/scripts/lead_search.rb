@@ -9,7 +9,7 @@ def navigate_to_lead(lead_state)
 end
 
 def lead_search_filter(filter_text)
-  wait_for_element_to_be_visible(:id, "search-filter", 60)
+  wait_for_element_to_be_visible(:id, "search-filter", 120)
   filter = @driver.find_element(:id, "search-filter")
   filter.send_keys filter_text
 end
