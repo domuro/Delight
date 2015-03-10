@@ -8,9 +8,8 @@ class DelightTestUiController < ApplicationController
   # POST /run_scripts
   def run_scripts
     parameters = params["params"]
-    # result = run_scripts(parameters)
 
-    # system("ruby #{Rails.root}/lib/scripts/main.rb #{parameters}")
+    system("ruby #{Rails.root}/lib/scripts/main.rb #{parameters}")
     results = File.read("#{Rails.root}/lib/assets/results.json")
 
     respond_to do |format|
